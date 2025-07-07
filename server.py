@@ -1,16 +1,28 @@
-from flask import Flask, render_template, request
-from EmotionDetection import emotion_detector
+
+
+from flask import Flask, request, render_template
+from EmotionDetection.emotion_detection import emotion_detector
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
+    """
+    Render the homepage.
+    """
     return render_template('index.html')
 
-@app.route('/emotionDetector', methods=['POST'])
+@app.route('/emotionDetector', methods=['GET'])
 def emotion_detect_route():
-    text = request.form['text']
+    """
+    Handle emotion detection requests and return formatted output.
+    """
+    text = request.args.get('textToAnalyze', '')
+
     result = emotion_detector(text)
+
+    if result['dominant_emotion'] is None:
+        return "Invalid text! Please try again!"
 
     response_string = (
         f"For the given statement, the system response is "
@@ -24,5 +36,5 @@ def emotion_detect_route():
 
     return response_string
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run()
